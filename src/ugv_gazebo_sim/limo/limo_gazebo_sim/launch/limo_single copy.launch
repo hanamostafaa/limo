@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Arguments for multi-robot -->
+    <!-- <arg name="robot_namespace" default="robot1"/> -->
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+
+    <!-- Robot namespace -->
+    <!-- <group ns="$(arg robot_namespace)"> -->
+
+        <!-- Robot description -->
+        <param name="robot_description"
+               command="$(find xacro)/xacro $(find limo_description)/urdf/limo_four_diff.xacro robot_namespace:=$(arg robot_namespace)" />
+
+        <!-- Load controllers -->
+        <rosparam file="$(find limo_gazebo_sim)/param/limo_four_diff_control.yaml"
+                  command="load"/>
+
+        <!-- Spawn the robot in Gazebo -->
+        <node name="spawn_limo_model"
+              pkg="gazebo_ros"
+              type="spawn_model"
+              args="-x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw)
+                    -urdf -param robot_description
+                    -model $(arg robot_namespace)" />
+
+        <!-- ✅ Robot state publisher WITH TF prefix -->
+        <node name="robot_state_publisher"
+              pkg="robot_state_publisher"
+              type="robot_state_publisher">
+            <param name="frame_prefix" value="$(arg robot_namespace)/"/>
+        </node>
+
+        <!-- Controller spawner -->
+        <node name="controller_spawner"
+              pkg="controller_manager"
+              type="spawner"
+              respawn="false"
+              output="screen"
+              args="limo_state_controller limo_diff_controller"/>
+
+        <!-- ✅ Static TF fix WITH prefixed frames -->
+        <node pkg="tf2_ros"
+              type="static_transform_publisher"
+              name="laser_link_fix"
+              args="0.1 0 0 0 0 0
+                    $(arg robot_namespace)/base_link
+                    $(arg robot_namespace)/laser_link"/>
+    <!-- </group> -->
+</launch>  

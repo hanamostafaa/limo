@@ -1,0 +1,17 @@
+<launch>
+  <group ns="robot1">
+    <node pkg="explore_lite" type="explore" name="explore"/>
+  </group>
+
+  <group ns="robot2">
+    <node pkg="explore_lite" type="explore" name="explore"/>
+  </group>
+
+  <group ns="robot3">
+    <node pkg="explore_lite" type="explore" name="explore"/>
+  </group>
+
+  <group ns="robot4">
+    <node pkg="explore_lite" type="explore" name="explore"/>
+  </group>
+</launch>

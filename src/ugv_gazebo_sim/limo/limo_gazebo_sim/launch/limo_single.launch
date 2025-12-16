@@ -1,0 +1,30 @@
+<launch>
+	<arg name="world_name" default="$(find limo_gazebo_sim)/worlds/limo.world"/>
+	<arg name="x" default="0.0"/>
+	<arg name="y" default="0.0"/>
+	<arg name="z" default="0.0"/>
+	<arg name="yaw" default="0.0"/>
+
+	<param name="/use_sim_time" value="true" />
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+    	<arg name="world_name" value="$(arg world_name)"/>
+    	<arg name="paused" value="false"/>
+    	<arg name="use_sim_time" value="true"/>
+    	<arg name="gui" value="true"/>
+	</include>
+
+	<param name="robot_description" command="$(find xacro)/xacro '$(find limo_description)/urdf/limo_four_diff.xacro' robot_namespace:=/" />
+
+	<rosparam file="$(find limo_gazebo_sim)/param/limo_four_diff_control.yaml" command="load"/>
+
+	<node name="spawn_limo_model" pkg="gazebo_ros" type="spawn_model"
+      	args="-x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw) -urdf -param robot_description -model limo_diff" />
+
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    
+	<node name="controller_spawner" pkg="controller_manager" type="spawner"
+      	respawn="false" output="screen" args="limo_state_controller limo_diff_controller"/>
+
+	<node pkg="tf2_ros" type="static_transform_publisher" name="laser_link_fix" args="0.1 0 0 0 0 0 base_link laser_link" />
+</launch>

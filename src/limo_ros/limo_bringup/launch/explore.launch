@@ -1,0 +1,10 @@
+<launch>
+
+  <!-- Explorer -->
+  <node pkg="explore_lite" type="explore" name="explore" output="screen">
+    <param name="planner_frequency" value="0.5"/>
+    <param name="progress_timeout" value="30.0"/>
+    <param name="visualize" value="true"/>
+  </node>
+
+</launch>
